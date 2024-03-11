@@ -57,4 +57,10 @@ public class Client {
         this.lastname = lastname;
     }
 
+
+    @Override
+    public String toString() {
+        return "{id=" + id + ", name=" + name + ", lastname=" + lastname + "}";
+    }
+
 }
