@@ -25,12 +25,6 @@ public class Invoice {
 
     }
     
-    public Invoice(Long id, String description, Long total) {
-        this.id = id;
-        this.description = description;
-        this.total = total;
-    }
-
     public Invoice(String description, Long total) {
         this.description = description;
         this.total = total;
@@ -58,6 +52,11 @@ public class Invoice {
 
     public void setTotal(Long total) {
         this.total = total;
+    }
+
+    @Override
+    public String toString() {
+        return "{id=" + id + ", description=" + description + ", total=" + total + ", client=" + client + "}";
     }
     
 }
