@@ -6,4 +6,5 @@ import com.nestor.curso.springboot.jpa.springbootjparelationship.entities.Invoic
 
 public interface InvoiceRepository extends CrudRepository<Invoice, Long>{
     
+    
 }

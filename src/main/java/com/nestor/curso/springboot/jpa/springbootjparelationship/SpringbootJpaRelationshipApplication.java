@@ -175,14 +175,85 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 			System.out.println(client);
 		});
 
+	}
 		/*
 		(En la clase Client hemos añadido un método para ahorrar estas líneas de código, aunque esto también estaría bien)
 		List<Invoice> invoices = new ArrayList<>();
 		invoices.add(invoice1);
 		invoices.add(invoice2);
 		 */
+		@Transactional
+		public void removeInvoiceBidireccionalFindById() {
+			Optional<Client>  optionalClient = clientRepository.findOne(1L);
+	
+			optionalClient.ifPresent(client -> {
+		
+				Invoice invoice1 = new Invoice("compras de la casa", 5000L);
+				Invoice invoice2 = new Invoice("compras de oficina", 8000L);
+	
+				client.addInvoice(invoice1).addInvoice(invoice2);
+		
+				clientRepository.save(client); // solo guardamos el cliente porque las facturas se guardan automáticamente (lo tenemos en cascada)
+		
+				System.out.println(client);
+			});
+	
+			Optional<Client>  optionalClientDb = clientRepository.findOne(1L);
 
-	}
+			optionalClientDb.ifPresent(client -> {
+				Invoice invoice3 = new Invoice("compras de la casa", 5000L);
+				invoice3.setId(1L);
+
+				Optional<Invoice> invoiceOptional = Optional.of(invoice3); // invoiceRepository.findById(2L);
+				invoiceOptional.ifPresent(invoice -> {
+					client.removeInvoice(invoice);
+					// client.getInvoices().remove(invoice);
+					// invoice.setClient(null);
+					clientRepository.save(client); 
+					System.out.println(client);
+				});
+			});
+
+		}
+
+		@Transactional
+		public void removeInvoiceBidireccional() {
+
+			Client client = new Client("Fran", "Moras");
+			//Optional<Client>  optionalClient = Optional.of(new Client("Fran", "Moras"));
+	
+		//	optionalClient.ifPresent(client -> {
+		
+				Invoice invoice1 = new Invoice("compras de la casa", 5000L);
+				Invoice invoice2 = new Invoice("compras de oficina", 8000L);
+	
+				client.addInvoice(invoice1).addInvoice(invoice2);
+		
+				clientRepository.save(client); // solo guardamos el cliente porque las facturas se guardan automáticamente (lo tenemos en cascada)
+		
+				System.out.println(client);
+		//	});
+	
+			Optional<Client>  optionalClientDb = clientRepository.findOne(3L);
+
+			optionalClientDb.ifPresent(clientDb -> {
+				// Invoice invoice3 = new Invoice("compras de la casa", 5000L);
+				// invoice3.setId(1L);
+
+				Optional<Invoice> invoiceOptional =   invoiceRepository.findById(2L); //Optional.of(invoice3);
+				invoiceOptional.ifPresent(invoice -> {
+					clientDb.removeInvoice(invoice);
+					// client.getInvoices().remove(invoice);
+					// invoice.setClient(null);
+					clientRepository.save(clientDb); 
+					System.out.println(clientDb);
+				});
+			});
+
+		}
+
+
+
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -192,7 +263,9 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 		//removeAddress();
 		//removeAddressFindById();
 		//oneToManyInvoiceBidireccional();
-		oneToManyInvoiceBidireccionalFindById();
+		//oneToManyInvoiceBidireccionalFindById();
+		//removeInvoiceBidireccionalFindById();
+		removeInvoiceBidireccional();
 	}
 
 }
