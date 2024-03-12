@@ -1,6 +1,8 @@
 package com.nestor.curso.springboot.jpa.springbootjparelationship;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,29 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 	
 			System.out.println(client);
 		});
+		
+	}
+
+	@Transactional
+	public void removeAddressFindById() {
+		Optional<Client> optionalClient = clientRepository.findById(2L);
+		optionalClient.ifPresent(client -> {
+			Address address1 = new Address("El verjel", 1234);
+			Address address2 = new Address("Vasco de Gama", 9875);
+	
+			client.setAddresses(Arrays.asList(address1, address2));
+	
+			clientRepository.save(client);
+	
+			System.out.println(client);
+
+			Optional<Client> optionalClient2 = clientRepository.findOne(2L);
+			optionalClient2.ifPresent(c-> {
+				c.getAddresses().remove(address2);
+				clientRepository.save(c);
+				System.out.println(c);
+		});
+	});
 		
 	}
 
@@ -108,12 +133,36 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 			System.out.println(invoiceDB);
 		}
 	}
+
+	@Transactional
+	public void oneToManyInvoiceBidireccional() {
+		Client client = new Client("Fran", "Moras");
+
+		Invoice invoice1 = new Invoice("compras de la casa", 5000L);
+		Invoice invoice2 = new Invoice("compras de oficina", 8000L);
+
+		List<Invoice> invoices = new ArrayList<>();
+		invoices.add(invoice1);
+		invoices.add(invoice2);
+		client.setInvoices(invoices);
+
+		invoice1.setClient(client);
+		invoice2.setClient(client);
+
+		clientRepository.save(client); // solo guardamos el cliente porque las facturas se guardan automáticamente (lo tenemos en cascada)
+
+		System.out.println(client);
+
+	}
+
 	@Override
 	public void run(String... args) throws Exception {
 		// manyToOne();
 		//oneToMany();
 		//oneToManyFindById();
-		removeAddress();
+		//removeAddress();
+		//removeAddressFindById();
+		oneToManyInvoiceBidireccional();
 	}
 
 }
