@@ -28,10 +28,6 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 		SpringApplication.run(SpringbootJpaRelationshipApplication.class, args);
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-		oneToManyFindById();
-	}
 
 	@Transactional
 	public void oneToManyFindById() {
@@ -63,6 +59,28 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 
 		System.out.println(client);
 	}
+	@Transactional
+	public void removeAddress(){
+		Client client = new Client("Fran", "Moras");
+
+		Address address1 = new Address("El verjel", 1234);
+		Address address2 = new Address("Vasco de Gama", 9875);
+
+		client.getAddresses().add(address1);
+		client.getAddresses().add(address2);
+
+		clientRepository.save(client);
+
+		System.out.println(client);
+
+		Optional<Client> optionalClient = clientRepository.findById(3L);
+		optionalClient.ifPresent(c-> {
+			c.getAddresses().remove(address1);
+			clientRepository.save(c);
+			System.out.println(c);
+		});
+	}
+
 
 	@Transactional
 	public void manyToOne() {
@@ -90,4 +108,12 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 			System.out.println(invoiceDB);
 		}
 	}
+	@Override
+	public void run(String... args) throws Exception {
+		// manyToOne();
+		//oneToMany();
+		//oneToManyFindById();
+		removeAddress();
+	}
+
 }
