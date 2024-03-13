@@ -1,6 +1,7 @@
 package com.nestor.curso.springboot.jpa.springbootjparelationship;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,9 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nestor.curso.springboot.jpa.springbootjparelationship.entities.Address;
 import com.nestor.curso.springboot.jpa.springbootjparelationship.entities.Client;
+import com.nestor.curso.springboot.jpa.springbootjparelationship.entities.ClientDetails;
+import com.nestor.curso.springboot.jpa.springbootjparelationship.entities.Course;
 import com.nestor.curso.springboot.jpa.springbootjparelationship.entities.Invoice;
+import com.nestor.curso.springboot.jpa.springbootjparelationship.entities.Student;
+import com.nestor.curso.springboot.jpa.springbootjparelationship.repositories.ClientDetailsRepository;
 import com.nestor.curso.springboot.jpa.springbootjparelationship.repositories.ClientRepository;
 import com.nestor.curso.springboot.jpa.springbootjparelationship.repositories.InvoiceRepository;
+import com.nestor.curso.springboot.jpa.springbootjparelationship.repositories.StudentRepository;
 
 @SpringBootApplication
 public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
@@ -24,6 +30,12 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 
 	@Autowired
 	private InvoiceRepository invoiceRepository;
+
+	@Autowired
+	private ClientDetailsRepository clientDetailsRepository;
+
+	@Autowired
+	private StudentRepository studentRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbootJpaRelationshipApplication.class, args);
@@ -252,6 +264,71 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 
 		}
 
+		@Transactional
+		public void OneToOne() {
+			ClientDetails clientDetails = new ClientDetails(true, 5000);
+			clientDetailsRepository.save(clientDetails);
+
+			Client client = new Client("Erba", "Pura");
+			client.setClientDetails(clientDetails);
+			clientRepository.save(client);
+
+			System.out.println(client);
+
+		}
+
+		@Transactional
+		public void OneToOneFindById() {
+			ClientDetails clientDetails = new ClientDetails(true, 5000);
+			clientDetailsRepository.save(clientDetails);
+
+			Optional<Client> clientOptional = clientRepository.findOne(2L); // new Client("Erba", "Pura");
+			clientOptional.ifPresent(client -> {
+			client.setClientDetails(clientDetails);
+			clientRepository.save(client);
+
+			System.out.println(client);
+
+			});
+			
+		}
+
+		@Transactional
+		public void OneToOneBidireccionalFindById() {
+			
+			Optional <Client> clientOptional = clientRepository.findOne(1L);
+			clientOptional.ifPresent(client-> {
+				ClientDetails clientDetails = new ClientDetails(true, 5000);
+
+				client.setClientDetails(clientDetails);
+				
+				clientRepository.save(client);
+	
+				System.out.println(client);
+			});
+
+		}
+
+		@SuppressWarnings("null")
+		@Transactional
+		public void manyToMany() {
+
+			Student student1 = new Student("Jano", "Pura");
+			Student student2 = new Student("Erba", "Doe");
+
+			Course course1 = new Course("Curso de JAVA master", "Andres");
+			Course course2 = new Course("Curso de Spring Boot", "Andres");
+
+			student1.setCourses(Set.of(course1, course2));
+			student2.setCourses(Set.of(course1));
+
+			studentRepository.saveAll(List.of(student1,student2));
+
+			System.out.println(student1);
+			System.out.println(student2);
+
+		}
+
 
 
 
@@ -265,7 +342,11 @@ public class SpringbootJpaRelationshipApplication implements CommandLineRunner {
 		//oneToManyInvoiceBidireccional();
 		//oneToManyInvoiceBidireccionalFindById();
 		//removeInvoiceBidireccionalFindById();
-		removeInvoiceBidireccional();
+		//removeInvoiceBidireccional();
+		//OneToOne();
+		//OneToOneFindById();
+		//OneToOneBidireccionalFindById();
+		manyToMany();
 	}
 
 }
